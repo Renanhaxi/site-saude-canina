@@ -16,6 +16,457 @@
     .btn-primary{background:var(--brand);color:#fff;border-color:var(--brand)}
     .btn-primary:hover{background:var(--brand-600)}
     .btn-light{background:#fff;color:#111827;border-color:#e5e7eb}
+    .nav .active{background:var(--brand);color:#fff;border-color:var(--brand)}
+    .input{width:100%;border:1px solid #e5e7eb;border-radius:10px;padding:.6rem .75rem}
+    .label{font-size:.85rem;color:#6b7280}
+    .toast{position:fixed;right:16px;bottom:16px;background:#111827;color:#fff;padding:.75rem 1rem;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.2);opacity:0;transform:translateY(10px);transition:.25s}
+    .toast.show{opacity:1;transform:translateY(0)}
+    .hint{background:#fff7ed;border:1px solid #fed7aa;color:#7c2d12;padding:.5rem .75rem;border-radius:.5rem;font-size:.85rem}
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+<div class="max-w-6xl mx-auto p-4 md:p-8">
+  <!-- HEADER -->
+  <header class="mb-6 md:mb-8 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <svg width="40" height="40" viewBox="0 0 48 48" class="rounded-2xl" aria-label="Logo Saúde Canina">
+        <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#d97706"/></linearGradient></defs>
+        <rect x="0" y="0" width="48" height="48" rx="12" fill="url(#g)"/>
+        <circle cx="16" cy="20" r="4" fill="#fff"/><circle cx="24" cy="16" r="4" fill="#fff"/>
+        <circle cx="32" cy="20" r="4" fill="#fff"/><circle cx="24" cy="28" r="8" fill="#fff"/>
+      </svg>
+      <div>
+        <h1 class="text-2xl md:text-3xl font-bold" id="brandName">Saúde Canina</h1>
+        <p class="text-sm text-gray-500 -mt-1">Saúde & Rotina do seu pet</p>
+      </div>
+      <span class="inline-block px-2 py-0.5 rounded-full text-xs" style="background:var(--brand-50);color:var(--brand-600)">MVP</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <div id="userBox" class="text-sm text-gray-600"></div>
+    </div>
+  </header>
+
+  <!-- HINT -->
+  <div id="sandboxHint" class="hint mb-4 hidden">
+    Pré-visualização em sandbox detectada. Se o login não funcionar aqui, teste no seu domínio real.
+  </div>
+
+  <!-- AUTH -->
+  <section id="authSection" class="card mb-6">
+    <h2 class="text-xl font-semibold mb-2">Entrar ou criar conta</h2>
+    <p class="text-gray-600 text-sm mb-4">Use e-mail e senha ou peça um link mágico.</p>
+    <div class="grid sm:grid-cols-2 gap-3">
+      <div><label class="label">E-mail</label><input id="email" type="email" class="input" placeholder="voce@exemplo.com" autocomplete="email" /></div>
+      <div><label class="label">Senha</label><input id="password" type="password" class="input" placeholder="mín. 6 caracteres" autocomplete="current-password" /></div>
+    </div>
+    <div class="flex flex-wrap gap-3 mt-4">
+      <button class="btn btn-primary" id="btnSignIn">Entrar</button>
+      <button class="btn btn-light" id="btnSignUp">Criar conta</button>
+      <button class="btn btn-light" id="btnMagic">Link mágico</button>
+      <button class="btn btn-light" id="btnResend">Reenviar confirmação</button>
+    </div>
+    <p id="authMsg" class="text-sm mt-3"></p>
+  </section>
+
+  <!-- APP -->
+  <section id="appSection" class="hidden">
+    <div class="card mb-4 flex items-center justify-between">
+      <nav class="nav flex flex-wrap gap-2">
+        <button class="btn btn-light" data-tab="dashboard">Dashboard</button>
+        <button class="btn btn-light" data-tab="pets">Pets</button>
+        <button class="btn btn-light" data-tab="weights">Pesos</button>
+        <button class="btn btn-light" data-tab="records">Histórico</button>
+        <button class="btn btn-light" data-tab="reminders">Lembretes</button>
+      </nav>
+      <div class="flex items-center gap-2">
+        <button class="btn btn-light" id="btnExportPdf">Exportar PDF</button>
+        <button class="btn btn-primary" id="btnSignOut">Sair</button>
+      </div>
+    </div>
+
+    <div id="tab-dashboard" class="card mb-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold mb-1">Resumo</h2>
+          <p id="dashInfo" class="text-sm text-gray-700"></p>
+        </div>
+        <div><button id="btnApplyShihTzu" class="btn btn-primary">Rotina Shih Tzu</button></div>
+      </div>
+    </div>
+
+    <div id="tab-pets" class="card mb-6 hidden">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold">Seus Pets</h2>
+        <p class="text-sm text-gray-500">Selecione um pet para operar.</p>
+      </div>
+      <div class="grid md:grid-cols-4 gap-3 mb-3">
+        <div><label class="label">Nome</label><input id="petName" class="input" placeholder="Ex.: Zuzu" /></div>
+        <div><label class="label">Raça</label><input id="petBreed" class="input" placeholder="Ex.: Shih Tzu" /></div>
+        <div><label class="label">Nascimento</label><input id="petBirth" type="date" class="input" /></div>
+        <div><label class="label">Sexo</label><select id="petSex" class="input"><option value="">—</option><option value="F">Fêmea</option><option value="M">Macho</option></select></div>
+      </div>
+      <div class="flex gap-2 mb-4">
+        <button class="btn btn-primary" id="btnAddPet">Adicionar Pet</button>
+        <button class="btn btn-light" id="btnReloadPets">Recarregar</button>
+      </div>
+      <div class="overflow-auto">
+        <table class="w-full text-sm">
+          <thead class="text-left text-gray-500 border-b">
+            <tr><th class="py-2">Selecionar</th><th>Nome</th><th>Raça</th><th>Nascimento</th><th class="text-right">Ações</th></tr>
+          </thead>
+          <tbody id="petsTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="tab-weights" class="card mb-6 hidden">
+      <h2 class="text-lg font-semibold mb-3">Pesagens</h2>
+      <div class="grid md:grid-cols-3 gap-3 mb-3">
+        <div><label class="label">Data</label><input id="wDate" type="date" class="input" /></div>
+        <div><label class="label">Peso (kg)</label><input id="wKg" type="number" step="0.001" class="input" placeholder="Ex.: 5.600" /></div>
+        <div class="flex items-end"><button class="btn btn-primary" id="btnAddWeight">Adicionar Peso</button></div>
+      </div>
+      <div class="overflow-auto">
+        <table class="w-full text-sm">
+          <thead class="text-left text-gray-500 border-b">
+            <tr><th class="py-2">Data</th><th>Peso (kg)</th></tr>
+          </thead>
+          <tbody id="weightsTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="tab-records" class="card mb-6 hidden">
+      <h2 class="text-lg font-semibold mb-3">Histórico</h2>
+      <div class="grid md:grid-cols-4 gap-3 mb-3">
+        <div><label class="label">Tipo</label>
+          <select id="recKind" class="input">
+            <option value="vaccine">Vacina</option><option value="deworm">Vermífugo</option>
+            <option value="flea">Antipulgas</option><option value="groom">Grooming/Tosa</option>
+            <option value="med">Medicação</option><option value="exam">Exame</option><option value="note">Nota</option>
+          </select>
+        </div>
+        <div><label class="label">Título</label><input id="recTitle" class="input" placeholder="Ex.: V10 dose 1" /></div>
+        <div><label class="label">Data</label><input id="recDate" type="date" class="input" /></div>
+        <div><label class="label">Observações</label><input id="recNotes" class="input" placeholder="Lote, clínica, etc." /></div>
+      </div>
+      <div class="flex gap-2 mb-4">
+        <button class="btn btn-primary" id="btnAddRecord">Adicionar Registro</button>
+        <button class="btn btn-light" id="btnReloadRecords">Recarregar</button>
+      </div>
+      <div class="overflow-auto">
+        <table class="w-full text-sm">
+          <thead class="text-left text-gray-500 border-b">
+            <tr><th class="py-2">Data</th><th>Tipo</th><th>Título</th><th>Obs.</th></tr>
+          </thead>
+          <tbody id="recordsTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="tab-reminders" class="card mb-6 hidden">
+      <h2 class="text-lg font-semibold mb-3">Lembretes</h2>
+      <div class="grid md:grid-cols-4 gap-3 mb-3">
+        <div><label class="label">Tipo</label>
+          <select id="remKind" class="input">
+            <option value="vaccine">Vacina</option><option value="deworm">Vermífugo</option>
+            <option value="flea">Antipulgas</option><option value="groom">Grooming/Tosa</option>
+            <option value="med">Medicação</option><option value="custom">Personalizado</option>
+          </select>
+        </div>
+        <div><label class="label">Título</label><input id="remTitle" class="input" placeholder="Ex.: Reforço V10" /></div>
+        <div><label class="label">Quando</label><input id="remDateTime" type="datetime-local" class="input" /></div>
+        <div><label class="label">Periodicidade</label>
+          <select id="remPeriod" class="input">
+            <option value="">Único</option><option value="P30D">Mensal (30d)</option>
+            <option value="P3M">Trimestral (3m)</option><option value="P6M">Semestral (6m)</option><option value="P1Y">Anual (1a)</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex gap-2 mb-4">
+        <button class="btn btn-primary" id="btnAddReminder">Criar Lembrete</button>
+        <button class="btn btn-light" id="btnReloadReminders">Recarregar</button>
+      </div>
+      <div class="overflow-auto">
+        <table class="w-full text-sm">
+          <thead class="text-left text-gray-500 border-b">
+            <tr><th class="py-2">Data/Hora</th><th>Título</th><th>Tipo</th><th>Ativo</th></tr>
+          </thead>
+          <tbody id="remindersTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer class="max-w-6xl mx-auto p-4 md:p-8 text-xs text-gray-500">
+  <p>© Saúde Canina. Este site não substitui avaliação veterinária. Em emergências, procure um profissional.</p>
+</footer>
+
+<div id="toast" class="toast">ok</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ===== CONFIG ===== */
+  const BRAND_NAME = "Saúde Canina";
+  const TZ = "America/Belem";
+  // Redirecionamento usado nos e-mails do Supabase:
+  const EMAIL_REDIRECT = "https://saudecanina.com.br/"; // altere se o app estiver em /app/
+  // Suas credenciais Supabase:
+  const SUPABASE_URL = "https://gclcyagmerselwbjwftl.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjbGN5YWdtZXJzZWx3Ymp3ZnRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE5NzIyMTQsImV4cCI6MjA3NzU0ODIxNH0.T8IY09MnDJcCv3kp756iwnRgbShRQaeRnvRK8pVbLeQ";
+  /* =================== */
+
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: true, autoRefreshToken: true }
+  });
+
+  let currentUser = null, selectedPet = null;
+  const $ = (id)=>document.getElementById(id);
+  const fmtDate = (d)=> new Date(d).toLocaleDateString('pt-BR',{ timeZone:TZ });
+  const fmtDateTime = (d)=> new Date(d).toLocaleString('pt-BR',{ timeZone:TZ });
+
+  function toast(msg, ok=true){
+    const t=$('toast'); t.textContent=msg; t.style.background= ok? '#111827':'#991b1b';
+    t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2200);
+  }
+  function setAuthMsg(text, ok=false){
+    const el=$('authMsg'); el.textContent=text||''; el.className='text-sm mt-3 '+(ok?'text-green-700':'text-red-600');
+  }
+  function activateTab(name){
+    document.querySelectorAll('.nav .btn').forEach(b=>b.classList.remove('active'));
+    const btn=document.querySelector(`[data-tab="${name}"]`); if(btn) btn.classList.add('active');
+    ['dashboard','pets','weights','records','reminders'].forEach(t=>{
+      const el=$('tab-'+t); if(el) el.classList.toggle('hidden', t!==name);
+    });
+  }
+  function showSandboxHint(){
+    try{ const isIframe = window.self !== window.top; if(isIframe || !window.isSecureContext){ $('sandboxHint').classList.remove('hidden'); } }catch(e){}
+  }
+
+  async function ensureProfile(){
+    if(!currentUser) return;
+    const { data:p } = await sb.from('profiles').select('id').eq('id', currentUser.id).maybeSingle();
+    if(!p){ await sb.from('profiles').insert({ id: currentUser.id, full_name: (currentUser.email||'').split('@')[0] }); }
+  }
+
+  async function onLoggedIn(){
+    $('authSection').classList.add('hidden');
+    $('appSection').classList.remove('hidden');
+    $('userBox').innerHTML = `<div class="text-right"><div class="text-xs text-gray-500">Conectado</div><div class="font-semibold">${currentUser.email}</div></div>`;
+    activateTab('dashboard');
+    await refreshAll();
+  }
+
+  async function refreshAll(){
+    await Promise.all([loadPets(), loadWeights(), loadRecords(), loadReminders()]);
+    const petsCount = (await sb.from('pets').select('id',{ count:'exact', head:true })).count || 0;
+    const remCount  = (await sb.from('reminders').select('id',{ count:'exact', head:true })).count || 0;
+    $('dashInfo').textContent = `Você tem ${petsCount} pet(s) e ${remCount} lembrete(s) ativos. Selecione um pet em “Pets”.`;
+  }
+
+  async function loadPets(){
+    const { data, error } = await sb.from('pets').select('*').order('created_at',{ascending:false});
+    if(error){ toast(error.message,false); return; }
+    const tbody=$('petsTable'); tbody.innerHTML='';
+    (data||[]).forEach(p=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML = `<td class="py-2"><input type="radio" name="petSelect"></td><td>${p.name}</td><td>${p.breed||''}</td><td>${p.birth_date?fmtDate(p.birth_date):''}</td><td class="text-right"><button class="text-red-600 underline text-xs" data-del="${p.id}">remover</button></td>`;
+      const r=tr.querySelector('input[type=radio]'); r.checked= selectedPet && selectedPet.id===p.id; r.onclick=()=>{ selectedPet=p; toast('Pet selecionado: '+p.name); };
+      tr.querySelector('[data-del]').onclick= async ()=>{ if(confirm('Remover este pet e seus dados?')){ await sb.from('pets').delete().eq('id', p.id); if(selectedPet?.id===p.id) selectedPet=null; await refreshAll(); } };
+      tbody.appendChild(tr);
+    });
+  }
+
+  async function loadWeights(){
+    const tbody=$('weightsTable');
+    if(!selectedPet){ tbody.innerHTML='<tr><td class="py-2 text-gray-500" colspan="2">Selecione um pet.</td></tr>'; return; }
+    const { data, error } = await sb.from('weights').select('*').eq('pet_id', selectedPet.id).order('at_date',{ascending:false});
+    if(error){ toast(error.message,false); return; }
+    tbody.innerHTML=''; (data||[]).forEach(w=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td class="py-2">${fmtDate(w.at_date)}</td><td>${Number(w.weight_kg).toFixed(3)}</td>`; tbody.appendChild(tr); });
+  }
+
+  async function loadRecords(){
+    const tbody=$('recordsTable');
+    if(!selectedPet){ tbody.innerHTML='<tr><td class="py-2 text-gray-500" colspan="4">Selecione um pet.</td></tr>'; return; }
+    const { data, error } = await sb.from('records').select('*').eq('pet_id', selectedPet.id).order('at_date',{ascending:false});
+    if(error){ toast(error.message,false); return; }
+    tbody.innerHTML=''; (data||[]).forEach(r=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td class="py-2">${fmtDate(r.at_date)}</td><td>${r.kind}</td><td>${r.title||''}</td><td>${r.notes||''}</td>`; tbody.appendChild(tr); });
+  }
+
+  async function loadReminders(){
+    const tbody=$('remindersTable');
+    const petIds=(await sb.from('pets').select('id')).data?.map(p=>p.id)||[];
+    if(petIds.length===0){ tbody.innerHTML='<tr><td class="py-2 text-gray-500" colspan="4">Cadastre um pet.</td></tr>'; return; }
+    const { data, error } = await sb.from('reminders').select('*').in('pet_id', petIds).order('due_at');
+    if(error){ toast(error.message,false); return; }
+    tbody.innerHTML=''; (data||[]).forEach(r=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td class="py-2">${fmtDateTime(r.due_at)}</td><td>${r.title||''}</td><td>${r.kind}</td><td>${r.active?'Sim':'Não'}</td>`; tbody.appendChild(tr); });
+  }
+
+  document.addEventListener('DOMContentLoaded', async ()=>{
+    $('brandName').textContent = BRAND_NAME;
+    document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>activateTab(b.dataset.tab)));
+    activateTab('dashboard');
+
+    try{ const isIframe = window.self !== window.top; if(isIframe || !window.isSecureContext){ $('sandboxHint').classList.remove('hidden'); } }catch(e){}
+
+    // AUTH listeners
+    $('btnSignIn').addEventListener('click', async ()=>{
+      setAuthMsg('');
+      const email=$('email').value.trim(), password=$('password').value.trim();
+      if(!email || !password){ setAuthMsg('Informe e-mail e senha.'); return; }
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if(error){ setAuthMsg(error.message); return; }
+      currentUser = data.user; await ensureProfile(); await onLoggedIn();
+    });
+
+    $('btnSignUp').addEventListener('click', async ()=>{
+      setAuthMsg('');
+      const email=$('email').value.trim(), password=$('password').value.trim();
+      if(!email || !password){ setAuthMsg('Informe e-mail e senha.'); return; }
+      const { data, error } = await sb.auth.signUp({
+        email, password,
+        options: { emailRedirectTo: EMAIL_REDIRECT }
+      });
+      if(error){ setAuthMsg(error.message); return; }
+
+      if(!data.session){
+        setAuthMsg('Conta criada. Verifique seu e-mail e volte pelo link enviado.', true);
+        return;
+      }
+      currentUser = data.user; await ensureProfile(); await onLoggedIn();
+    });
+
+    $('btnMagic').addEventListener('click', async ()=>{
+      setAuthMsg('');
+      const email=$('email').value.trim();
+      if(!email){ setAuthMsg('Informe o e-mail.'); return; }
+      const { error } = await sb.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: EMAIL_REDIRECT }
+      });
+      if(error){ setAuthMsg(error.message); return; }
+      setAuthMsg('Link mágico enviado. Verifique seu e-mail.', true);
+    });
+
+    $('btnResend').addEventListener('click', async ()=>{
+      setAuthMsg('');
+      const email=$('email').value.trim();
+      if(!email){ setAuthMsg('Informe o e-mail.'); return; }
+      // Reenvia e-mail de confirmação de cadastro
+      const { error } = await sb.auth.resend({ type: 'signup', email });
+      if(error){ setAuthMsg(error.message); return; }
+      setAuthMsg('Reenvio solicitado. Cheque sua caixa de entrada/spam.', true);
+    });
+
+    $('btnSignOut').addEventListener('click', async ()=>{
+      await sb.auth.signOut(); currentUser=null; selectedPet=null;
+      $('userBox').innerHTML=''; $('authSection').classList.remove('hidden'); $('appSection').classList.add('hidden');
+    });
+
+    // CRUD
+    $('btnAddPet').addEventListener('click', async ()=>{
+      if(!currentUser){ toast('Faça login primeiro', false); return; }
+      const body={ owner_id: currentUser.id, name:$('petName').value.trim(), breed:$('petBreed').value.trim(), birth_date:$('petBirth').value||null, sex:$('petSex').value||null };
+      if(!body.name){ toast('Informe o nome', false); return; }
+      const { error } = await sb.from('pets').insert(body);
+      if(error){ toast(error.message,false); return; }
+      $('petName').value='';$('petBreed').value='';$('petBirth').value='';$('petSex').value='';
+      await loadPets(); toast('Pet adicionado!');
+    });
+    $('btnReloadPets').addEventListener('click', loadPets);
+
+    $('btnAddWeight').addEventListener('click', async ()=>{
+      if(!selectedPet){ toast('Selecione um pet em "Pets"', false); return; }
+      const at=$('wDate').value||new Date().toISOString().slice(0,10), kg=parseFloat($('wKg').value||'0');
+      if(!kg){ toast('Informe o peso (kg)', false); return; }
+      const { error } = await sb.from('weights').insert({ pet_id:selectedPet.id, at_date:at, weight_kg:kg });
+      if(error){ toast(error.message,false); return; }
+      $('wDate').value='';$('wKg').value=''; await loadWeights(); toast('Peso adicionado!');
+    });
+
+    $('btnAddRecord').addEventListener('click', async ()=>{
+      if(!selectedPet){ toast('Selecione um pet em "Pets"', false); return; }
+      const body={ pet_id:selectedPet.id, kind:$('recKind').value, title:$('recTitle').value.trim()||null, at_date:$('recDate').value||new Date().toISOString().slice(0,10), notes:$('recNotes').value.trim()||null };
+      const { error } = await sb.from('records').insert(body);
+      if(error){ toast(error.message,false); return; }
+      $('recTitle').value='';$('recDate').value='';$('recNotes').value=''; await loadRecords(); toast('Registro adicionado!');
+    });
+    $('btnReloadRecords').addEventListener('click', loadRecords);
+
+    $('btnAddReminder').addEventListener('click', async ()=>{
+      if(!selectedPet){ toast('Selecione um pet em "Pets"', false); return; }
+      const due=$('remDateTime').value? new Date($('remDateTime').value): new Date();
+      const body={ pet_id:selectedPet.id, kind:$('remKind').value, title:$('remTitle').value.trim()||'Lembrete', due_at:due.toISOString(), periodicity:$('remPeriod').value||null, active:true };
+      const { error } = await sb.from('reminders').insert(body);
+      if(error){ toast(error.message,false); return; }
+      $('remTitle').value='';$('remDateTime').value='';$('remPeriod').value=''; await loadReminders(); toast('Lembrete criado!');
+    });
+    $('btnReloadReminders').addEventListener('click', loadReminders);
+
+    $('btnApplyShihTzu').addEventListener('click', async ()=>{
+      if(!selectedPet){ toast('Selecione um pet em "Pets"', false); return; }
+      const base=new Date(), add=(days,title,kind,period)=>({pet_id:selectedPet.id,title,kind,due_at:new Date(base.getTime()+days*86400000).toISOString(),periodicity:period||null,active:true});
+      const items=[ add(0,'Limpeza de olhos (lacrimejamento)','groom','P7D'), add(0,'Higiene auricular','groom','P14D'),
+                    add(3,'Antipulgas/antiparasitário','flea','P30D'), add(10,'Vermífugo (reforço)','deworm','P3M'),
+                    add(20,'Tosa higiênica','groom','P30D'), add(30,'Revisão clínica geral','note','P6M'),
+                    add(40,'Vacina anual (lembrete)','vaccine','P1Y') ];
+      const { error } = await sb.from('reminders').insert(items);
+      if(error){ toast(error.message,false); return; }
+      await loadReminders(); toast('Rotina Shih Tzu aplicada!');
+    });
+
+    $('btnExportPdf').addEventListener('click', async ()=>{
+      if(!selectedPet){ toast('Selecione um pet em "Pets"', false); return; }
+      const { jsPDF } = window.jspdf; const doc=new jsPDF();
+      doc.setFontSize(16); doc.text(`${BRAND_NAME} — Relatório de Saúde`,14,16);
+      doc.setFontSize(12); doc.text(`Pet: ${selectedPet.name} (${selectedPet.breed||'—'})`,14,24);
+      doc.setFontSize(10); doc.text(`Gerado em ${fmtDateTime(new Date())} — TZ ${TZ}`,14,30);
+      const { data: recs } = await sb.from('records').select('*').eq('pet_id', selectedPet.id).order('at_date',{ascending:false});
+      let y=40; doc.setFont(undefined,'bold'); doc.text('Histórico',14,y); y+=6; doc.setFont(undefined,'normal');
+      (recs||[]).forEach(r=>{ const line=`${fmtDate(r.at_date)} • ${r.kind} • ${r.title||''} ${r.notes?('— '+r.notes):''}`; const split=doc.splitTextToSize(line,180); split.forEach(s=>{ doc.text(s,14,y); y+=5; if(y>280){ doc.addPage(); y=16; } }); y+=2; });
+      doc.save(`relatorio-${selectedPet.name}.pdf`);
+    });
+
+    // Restaura sessão
+    const { data } = await sb.auth.getSession();
+    if(data.session){ currentUser=data.session.user; await onLoggedIn(); }
+
+    // Auto-login ao voltar do e-mail
+    sb.auth.onAuthStateChange((event, session) => {
+      if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED")) {
+        currentUser = session.user;
+        ensureProfile().then(onLoggedIn);
+      }
+    });
+  });
+
+  // Diagnóstico: mostra erros JS no toast
+  window.addEventListener('error', (e)=>{ console.error(e.error||e.message); toast('Erro: '+(e.message||'ver console'), false); });
+})();
+</script>
+</body>
+</html>
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <title>Saúde Canina — Saúde & Rotina do Pet</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Organize vacinas, vermífugo, antipulgas, grooming e gere relatório em PDF para o veterinário.">
+  <meta name="theme-color" content="#f59e0b">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <style>
+    :root{--brand:#f59e0b;--brand-600:#d97706;--brand-50:#fffbeb}
+    .card{background:#fff;border:1px solid #eee;border-radius:16px;padding:16px;box-shadow:0 8px 24px rgba(16,24,40,.06)}
+    .btn{padding:.6rem 1rem;border-radius:10px;border:1px solid #d1d5db;font-weight:600}
+    .btn-primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+    .btn-primary:hover{background:var(--brand-600)}
+    .btn-light{background:#fff;color:#111827;border-color:#e5e7eb}
     .tag{display:inline-block;padding:.25rem .5rem;border-radius:999px;background:var(--brand-50);color:var(--brand-600);font-size:.75rem}
     .nav .active{background:var(--brand);color:#fff;border-color:var(--brand)}
     .input{width:100%;border:1px solid #e5e7eb;border-radius:10px;padding:.6rem .75rem}
